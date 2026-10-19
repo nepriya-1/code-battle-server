@@ -55,16 +55,20 @@ io.on('connection', (socket) => {
   // 3. Обрабатываем движение игрока
   socket.on('playerMovement', (movementData) => {
     if (players[socket.id]) {
-      players[socket.id].x = movementData.x;
-      players[socket.id].y = movementData.y;
-      players[socket.id].characterKey = movementData.characterKey;
+        players[socket.id].x = movementData.x;
+        players[socket.id].y = movementData.y;
+        players[socket.id].characterKey = movementData.characterKey;
+        players[socket.id].anim = movementData.anim;       
+        players[socket.id].flipX = movementData.flipX;
       
       // Пересылаем новые координаты ВСЕМ, КРОМЕ отправителя
       socket.broadcast.emit('playerMoved', {
         id: socket.id,
         x: movementData.x,
         y: movementData.y,
-        characterKey: movementData.characterKey
+        characterKey: movementData.characterKey,
+        anim: movementData.anim,                      
+        flipX: movementData.flipX 
       });
     }
   });
