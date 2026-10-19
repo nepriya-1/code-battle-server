@@ -38,6 +38,14 @@ const players = {};
 io.on('connection', (socket) => {
   console.log('Игрок подключился:', socket.id);
 
+  // 1. ДОБАВЛЯЕМ НОВОГО ИГРОКА В ПАМЯТЬ СЕРВЕРА
+  players[socket.id] = {
+    id: socket.id,
+    x: 1320, // Начальные координаты
+    y: 1128,
+    characterKey: 'js' // По умолчанию
+  };
+
   // 1. Отправляем новому игроку список всех, кто уже в игре
   socket.emit('currentPlayers', players);
 
