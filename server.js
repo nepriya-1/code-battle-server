@@ -60,6 +60,7 @@ io.on('connection', (socket) => {
         players[socket.id].characterKey = movementData.characterKey;
         players[socket.id].anim = movementData.anim;       
         players[socket.id].flipX = movementData.flipX;
+        players[socket.id].isStopped = movementData.isStopped;
       
       // Пересылаем новые координаты ВСЕМ, КРОМЕ отправителя
       socket.broadcast.emit('playerMoved', {
@@ -68,7 +69,8 @@ io.on('connection', (socket) => {
         y: movementData.y,
         characterKey: movementData.characterKey,
         anim: movementData.anim,                      
-        flipX: movementData.flipX 
+        flipX: movementData.flipX,
+        isStopped: movementData.isStopped
       });
     }
   });
