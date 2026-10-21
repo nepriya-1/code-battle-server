@@ -34,6 +34,11 @@ const pool = new Pool({
 // === ЛОГИКА МУЛЬТИПЛЕЕРА ===
 // Храним позиции игроков в памяти сервера (сбрасывается при перезагрузке)
 const players = {};
+const stats = {
+    js: 0,
+    c: 0,
+    python: 0
+};
 
 io.on('connection', (socket) => {
   console.log('Игрок подключился:', socket.id);
@@ -51,6 +56,9 @@ io.on('connection', (socket) => {
 
   // 2. Сообщаем всем остальным, что появился новый игрок
   socket.broadcast.emit('newPlayer', { id: socket.id, x: 1320, y: 1128 });
+
+  // Отправляем новому игроку текущую статистику
+  socket.emit('updateStats', stats);
 
   // 3. Обрабатываем движение игрока
   socket.on('playerMovement', (movementData) => {
@@ -91,10 +99,20 @@ io.on('connection', (socket) => {
 app.post('/api/score', async (req, res) => {
     const { playerId, taskId, language } = req.body;
     try {
+        // Сохраняем в базу
         await pool.query(
             'INSERT INTO scores (player_id, task_id, language) VALUES ($1, $2, $3)',
             [playerId, taskId, language]
         );
+
+        // Обновляем статистику в памяти
+        if (stats[language] !== undefined) {
+            stats[language]++;
+        }
+
+        // Отправляем обновленную статистику ВСЕМ игрокам через WebSocket
+        io.emit('updateStats', stats);
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
